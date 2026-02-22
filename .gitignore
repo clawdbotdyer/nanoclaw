@@ -9,14 +9,35 @@ store/
 data/
 logs/
 
-# Groups - only track base structure and specific CLAUDE.md files
+# Groups - track logic & docs, keep runtime state local
 groups/*
 !groups/main/
 !groups/global/
+!groups/sigmaboy/
+
+# Track in all groups: scripts and documentation
+!groups/*/CLAUDE.md
+!groups/*/soul.md
+!groups/*/scripts/
+
+# Keep local in all groups: runtime state & performance data
+groups/*/performance.json
+groups/*/state.json
+groups/*/signals/
+groups/*/paper-trades/
+groups/*/logs/
+groups/*/cache/
+groups/*/scripts/serve.pid
+groups/*/core.*
+
+# Group structure only
 groups/main/*
 groups/global/*
 !groups/main/CLAUDE.md
 !groups/global/CLAUDE.md
+!groups/sigmaboy/CLAUDE.md
+!groups/sigmaboy/soul.md
+!groups/sigmaboy/scripts/
 
 # Secrets
 *.keys.json
