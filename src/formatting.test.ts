@@ -1,4 +1,13 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+
+vi.mock('./config.js', async (importOriginal) => {
+  const mod = await importOriginal<typeof import('./config.js')>();
+  return {
+    ...mod,
+    ASSISTANT_NAME: 'Andy',
+    TRIGGER_PATTERN: new RegExp(`^@Andy\\b`, 'i'),
+  };
+});
 
 import { ASSISTANT_NAME, TRIGGER_PATTERN } from './config.js';
 import {
