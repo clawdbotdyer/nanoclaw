@@ -2,6 +2,7 @@ import { Bot } from 'grammy';
 
 import { ASSISTANT_NAME, TRIGGER_PATTERN } from '../config.js';
 import { logger } from '../logger.js';
+import { sanitizeFolderName } from '../sanitize.js';
 import {
   Channel,
   OnChatMetadata,
@@ -60,7 +61,7 @@ export class TelegramChannel implements Channel {
       const chatId = ctx.chat.id;
       const jid = `tg:${chatId}`;
       const name = (ctx.chat as any).title || `Group ${chatId}`;
-      const folder = name.toLowerCase().replace(/\s+/g, '-');
+      const folder = sanitizeFolderName(name);
       const trigger = '@SigmaBoy';
 
       this.opts.registerGroup(jid, {
