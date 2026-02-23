@@ -1,0 +1,15 @@
+{
+  "sigmaboy-orchestrator@internal": {
+    "name": "SigmaBoy Orchestrator",
+    "folder": "sigmaboy-orchestrator",
+    "trigger": "SigmaBoy-5min-Cycle",
+    "requiresTrigger": false,
+    "added_at": "2026-02-23T23:22:00Z",
+    "containerConfig": {
+      "env": {
+        "SIGMAGRID_API_KEY": "$SIGMAGRID_API_KEY",
+        "SIGMAGRID_ENDPOINT": "$SIGMAGRID_ENDPOINT"
+      }
+    }
+  }
+}

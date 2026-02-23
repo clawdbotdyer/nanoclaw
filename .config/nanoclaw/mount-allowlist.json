@@ -1,0 +1,15 @@
+{
+  "allowedRoots": [
+    {
+      "path": "~/nanoclaw/workspace",
+      "allowReadWrite": true,
+      "description": "SigmaBoy swarm state and workspace"
+    }
+  ],
+  "blockedPatterns": [
+    "password",
+    "secret",
+    "token"
+  ],
+  "nonMainReadOnly": false
+}

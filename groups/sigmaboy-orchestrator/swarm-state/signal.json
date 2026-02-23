@@ -1,0 +1,7 @@
+{
+  "cycle_id": "SB-20260223-235017-UTC",
+  "status": "ERROR",
+  "error": "API returned 404: No signal data available for SPY",
+  "fetched_at_utc": "2026-02-23T23:50:17Z",
+  "operator_access": true
+}

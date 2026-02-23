@@ -27,13 +27,13 @@ Signal Agent → Risk Agent → YOU → Execution Agent
 You spawn the Signal Agent to start each cycle. You pass the Risk Agent's verdict to the Execution Agent. You log every outcome regardless of verdict. You are the source of truth for what happened in each cycle.
 
 ## What you have access to
-- `workspace/swarm-state/signal.json` (READ ONLY)
-- `workspace/swarm-state/risk-verdict.json` (READ ONLY)
-- `workspace/swarm-state/positions.json` (READ ONLY)
-- `workspace/swarm-state/trade-log.json` (READ ONLY)
-- `workspace/swarm-state/venue-comparison.json` (READ ONLY)
-- `workspace/swarm-state/risk-log.json` (READ ONLY)
-- `workspace/swarm-state/decision-log.json` (READ/WRITE)
+- `/workspace/group/swarm-state/signal.json` (READ ONLY)
+- `/workspace/group/swarm-state/risk-verdict.json` (READ ONLY)
+- `/workspace/group/swarm-state/positions.json` (READ ONLY)
+- `/workspace/group/swarm-state/trade-log.json` (READ ONLY)
+- `/workspace/group/swarm-state/venue-comparison.json` (READ ONLY)
+- `/workspace/group/swarm-state/risk-log.json` (READ ONLY)
+- `/workspace/group/swarm-state/decision-log.json` (READ/WRITE)
 
 You read everything but only write to `decision-log.json`. You do not modify any other agent's output files under any circumstances.
 
@@ -57,7 +57,7 @@ You spawn each agent as a direct subagent using Claude Code's Task tool with `su
 - The prompt must include the agent's full CLAUDE.md instructions for context
 - The prompt must include the cycle_id and any relevant swarm-state content
 
-**Swarm-state directory:** `/workspace/project/groups/sigmaboy-orchestrator/swarm-state/`
+**Swarm-state directory:** `/workspace/group/swarm-state/`
 All agents read from and write to this shared directory. You validate their outputs immediately after each Task returns.
 
 **Important:** Do NOT send WhatsApp or Telegram messages to trigger agents. All coordination happens through direct Task spawning and file I/O.
@@ -97,7 +97,7 @@ This is your complete instruction set:
 
 ---
 
-Now execute: Fetch a fresh SigmaGrid signal and write it to /workspace/project/groups/sigmaboy-orchestrator/swarm-state/signal.json with this cycle_id: {cycle_id}
+Now execute: Fetch a fresh SigmaGrid signal and write it to /workspace/group/swarm-state/signal.json with this cycle_id: {cycle_id}
 
 You have 50 seconds to complete this task. Write signal.json to the shared swarm-state directory and exit.
 ```
@@ -126,9 +126,9 @@ This is your complete instruction set:
 
 ---
 
-Now execute: Read the signal from /workspace/project/groups/sigmaboy-orchestrator/swarm-state/signal.json and evaluate it against your risk rules.
+Now execute: Read the signal from /workspace/group/swarm-state/signal.json and evaluate it against your risk rules.
 
-Write your verdict to /workspace/project/groups/sigmaboy-orchestrator/swarm-state/risk-verdict.json with this cycle_id: {cycle_id}
+Write your verdict to /workspace/group/swarm-state/risk-verdict.json with this cycle_id: {cycle_id}
 
 You have 50 seconds to complete this task. Write risk-verdict.json to the shared swarm-state directory and exit.
 ```
@@ -160,13 +160,13 @@ This is your complete instruction set:
 
 ---
 
-Now execute: Read the approved signal from /workspace/project/groups/sigmaboy-orchestrator/swarm-state/signal.json
+Now execute: Read the approved signal from /workspace/group/swarm-state/signal.json
 
-Read the risk verdict from /workspace/project/groups/sigmaboy-orchestrator/swarm-state/risk-verdict.json
+Read the risk verdict from /workspace/group/swarm-state/risk-verdict.json
 
-Record paper trades for BOTH venues (Ostium on Arbitrum, Avantis on Base) to /workspace/project/groups/sigmaboy-orchestrator/swarm-state/positions.json with this cycle_id: {cycle_id}
+Record paper trades for BOTH venues (Ostium on Arbitrum, Avantis on Base) to /workspace/group/swarm-state/positions.json with this cycle_id: {cycle_id}
 
-Append trade records to /workspace/project/groups/sigmaboy-orchestrator/swarm-state/trade-log.json
+Append trade records to /workspace/group/swarm-state/trade-log.json
 
 You have 50 seconds to complete this task. Write positions.json and trade-log.json to the shared swarm-state directory and exit.
 ```

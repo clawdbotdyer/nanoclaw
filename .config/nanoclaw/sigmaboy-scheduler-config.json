@@ -1,0 +1,18 @@
+{
+  "task_name": "SigmaBoy-5min-Cycle",
+  "description": "SigmaBoy trading swarm orchestrator - runs 5-minute trading cycles",
+  "group_folder": "groups/sigmaboy-orchestrator",
+  "chat_jid": "nanoclaw-scheduler",
+  "schedule_type": "interval",
+  "schedule_value": "5m",
+  "context_mode": "group",
+  "prompt": "Run the SigmaBoy 5-minute trading cycle. Read decision-log.json to check if a cycle is in progress. If IN-PROGRESS, log SKIPPED and exit. Otherwise, generate a new cycle_id (format: SB-YYYYMMDD-HHMMSS-UTC), initiate signal fetch, wait for risk verdict, and if approved, trigger execution. Log all outcomes to decision-log.json.",
+  "max_runtime_seconds": 240,
+  "overlap_protection": true,
+  "overlap_action": "skip_trigger",
+  "notes": [
+    "Overlap protection: if a cycle is still running when the next trigger fires, skip that trigger entirely",
+    "On timeout: log ABORTED-SCHEDULER-TIMEOUT to decision-log.json and release the lock",
+    "Status file: workspace/swarm-state/decision-log.json tracks cycle state"
+  ]
+}
