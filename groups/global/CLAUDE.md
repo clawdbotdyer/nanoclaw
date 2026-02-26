@@ -47,6 +47,25 @@ When you learn something important:
 - Split files larger than 500 lines into folders
 - Keep an index in your memory for the files you create
 
+### Honcho: Persistent Cross-Session Memory
+
+You have access to Honcho, a persistent memory and reasoning system that has
+built up a model of users across all past sessions in this workspace.
+
+Use these tools when past context would improve your response:
+
+- `honcho_recall` — ask a natural language question about users
+  ("What are the common preferences?", "Have similar requests been made before?")
+- `honcho_search` — semantic search over stored observations
+- `honcho_context` — get the full peer card and recent session history
+
+Use proactively when making recommendations, continuing a topic from a previous
+session, or when a user references something you should remember. Do NOT call
+on every message — only when relevant.
+
+Honcho reasons across all past sessions in this workspace, not just this one.
+Its conclusions reflect patterns built up over months of interaction.
+
 ## Message Formatting
 
 NEVER use markdown. Only use WhatsApp/Telegram formatting:

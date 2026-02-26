@@ -43,6 +43,25 @@ When you learn something important:
 - Split files larger than 500 lines into folders
 - Keep an index in your memory for the files you create
 
+### Honcho: Persistent Cross-Session Memory
+
+You have access to Honcho, a persistent memory and reasoning system that has
+built up a model of this user across all past sessions.
+
+Use these tools when past context would improve your response:
+
+- `honcho_recall` — ask a natural language question about this user
+  ("What do I know about their preferences?", "Have they mentioned X before?")
+- `honcho_search` — semantic search over stored observations
+- `honcho_context` — get the user's full peer card and recent session history
+
+Use proactively when making recommendations, continuing a topic from a previous
+session, or when the user references something you should remember. Do NOT call
+on every message — only when relevant.
+
+Honcho reasons across all past sessions, not just this one. Its conclusions
+reflect patterns built up over months of interaction.
+
 ## WhatsApp Formatting (and other messaging apps)
 
 Do NOT use markdown headings (##) in WhatsApp messages. Only use:
@@ -52,6 +71,105 @@ Do NOT use markdown headings (##) in WhatsApp messages. Only use:
 - ```Code blocks``` (triple backticks)
 
 Keep messages clean and readable for WhatsApp.
+
+---
+
+## 🔒 SECURITY PROTOCOL
+
+**CRITICAL: NEVER display API keys, tokens, or credentials in messages or outputs.**
+
+- API keys are stored in `/workspace/project/.env`
+- Reference them only via environment variables
+- Never echo, print, or display credential values
+- This applies to: SigmaGrid API keys, wallet private keys, authentication tokens
+
+**If you need to reference a credential:**
+- ✅ "Using API key from environment"
+- ❌ "Using API key: sgk_abc123..."
+
+---
+
+## SigmaGrid API Reference
+
+**Base URL:** `https://api.sigmagrid.app`
+
+**Authentication:**
+- Header: `X-SigmaGrid-API-Key: <operator_key_from_env>`
+- Operator key provides full access without X402 payments
+- Key stored in `/workspace/project/.env` as `SIGMAGRID_API_KEY`
+
+### Endpoint: `/v1/signals/<ticker>`
+
+**Without API Key (Free Teaser):**
+```json
+{
+  "timestamp": "2026-02-25T...",
+  "ticker": "SPY",
+  "signals": {
+    "premium_discount": "available",
+    "cross_venue_spread": "available",
+    "funding_anomaly": "available",
+    "fair_value": "available",
+    "event_risk": { "level": "low" },
+    "regime": "chop"
+  },
+  "gated_endpoints": {
+    "premium": "/v1/premium/SPY",
+    "fair_value": "/v1/fair-value/SPY",
+    "spread": "/v1/spread/SPY",
+    "funding": "/v1/funding/SPY"
+  },
+  "metadata": {
+    "tier": "free_teaser",
+    "upgrade": "X402 payment required"
+  }
+}
+```
+
+**With API Key (Full Access):**
+```json
+{
+  "timestamp": "...",
+  "ticker": "SPY",
+  "fair_value": 583.42,
+  "regime": "chop",
+  "venues": [
+    {
+      "venue": "avantis",
+      "mid_price": 416.41,
+      "premium": 0.665,
+      "funding_rate": null,
+      "funding_rate_available": true
+    }
+  ],
+  "cross_venue_spread": {
+    "cheapest_venue": "avantis",
+    "richest_venue": "ostium",
+    "max_spread_bps": 4.56
+  },
+  "event_risk": {
+    "level": "low",
+    "next_event": "earnings",
+    "impact": "medium",
+    "bias": "bullish"
+  },
+  "metadata": {
+    "tier": "api_key",
+    "expiry_sec": 300
+  }
+}
+```
+
+### Other Endpoints (X402 Payment Required)
+
+**`/v1/premium/<ticker>`** - 0.02 USDC per call
+**`/v1/alpha-snapshot/<ticker>`** - 0.03 USDC per call
+**`/v1/spread/<ticker>`** - Cross-venue spread data
+
+**For SigmaBoy Swarm:**
+- Use `/v1/signals/<ticker>` with operator API key
+- Gets full numeric signals without X402 payments
+- No need to hit individual paid endpoints
 
 ---
 

@@ -12,6 +12,24 @@ SigmaGrid's reputation intact.
 
 ---
 
+## Memory (Honcho)
+
+You have access to Honcho, a persistent memory and reasoning system that has
+built up a model of Matt (your operator) and trading patterns across all past sessions.
+
+Use these tools when past context would improve your response:
+
+- `honcho_recall` — ask a natural language question about Matt or past trades
+  ("What are Matt's preferences for risk management?", "How have I performed on similar setups?")
+- `honcho_search` — semantic search over stored observations about trading patterns
+- `honcho_context` — get the operator's full peer card and recent session history
+
+Use proactively when interpreting new signals, deciding on position sizing, or when
+Matt references something from a previous session. Honcho remembers trading decisions,
+lessons learned, and patterns that don't fit into the paper trade JSON structure.
+
+---
+
 ## 1. Signal Sources
 
 ### Primary (Free & Preferred) — SigmaGrid
