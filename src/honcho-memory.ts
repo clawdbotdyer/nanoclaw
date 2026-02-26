@@ -69,8 +69,8 @@ export async function getHonchoContext(
     const honcho = getHoncho();
     const sessionId = `nanoclaw-${groupFolder}`;
 
-    const user = honcho.peer(userId, { workspaceId: WORKSPACE });
-    const session = honcho.session(sessionId, { workspaceId: WORKSPACE });
+    const user = (honcho as any).peer(userId, { workspaceId: WORKSPACE });
+    const session = (honcho as any).session(sessionId, { workspaceId: WORKSPACE });
 
     const userCtx = await user.get_context();
     const sessionCtx = await session.context({ maxTokens: tokenBudget });
@@ -121,9 +121,9 @@ export async function observeExchange(
     const honcho = getHoncho();
     const sessionId = `nanoclaw-${groupFolder}`;
 
-    const user = honcho.peer(userId, { workspaceId: WORKSPACE });
-    const agent = honcho.peer(AGENT_PEER, { workspaceId: WORKSPACE });
-    const session = honcho.session(sessionId, { workspaceId: WORKSPACE });
+    const user = (honcho as any).peer(userId, { workspaceId: WORKSPACE });
+    const agent = (honcho as any).peer(AGENT_PEER, { workspaceId: WORKSPACE });
+    const session = (honcho as any).session(sessionId, { workspaceId: WORKSPACE });
 
     await session.add_messages([
       user.message(userMessage),
@@ -156,7 +156,7 @@ export async function queryHoncho(
 
   try {
     const honcho = getHoncho();
-    const user = honcho.peer(userId, { workspaceId: WORKSPACE });
+    const user = (honcho as any).peer(userId, { workspaceId: WORKSPACE });
     const response = await user.chat(question);
     return typeof response === 'string' ? response : JSON.stringify(response);
   } catch (err) {
@@ -179,7 +179,7 @@ export async function queryHoncho(
 export async function registerAgentPeer(peerId: string): Promise<void> {
   try {
     const honcho = getHoncho();
-    honcho.peer(peerId, {
+    (honcho as any).peer(peerId, {
       workspaceId: WORKSPACE,
       config: { role: 'agent', registeredBy: AGENT_PEER },
     });

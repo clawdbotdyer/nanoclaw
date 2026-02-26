@@ -7,7 +7,9 @@
     "signal_outcome": null,
     "risk_outcome": null,
     "execution_outcome": null,
-    "notes": ["Swarm groups not registered. Missing registered_groups.json. Cannot trigger Signal Agent."]
+    "notes": [
+      "Swarm groups not registered. Missing registered_groups.json. Cannot trigger Signal Agent."
+    ]
   },
   {
     "cycle_id": "SB-20260223-231237-UTC",
@@ -17,7 +19,9 @@
     "signal_outcome": null,
     "risk_outcome": null,
     "execution_outcome": null,
-    "notes": ["Swarm groups not registered. Missing registered_groups.json. Cannot trigger Signal Agent, Risk Agent, or Execution Agent."]
+    "notes": [
+      "Swarm groups not registered. Missing registered_groups.json. Cannot trigger Signal Agent, Risk Agent, or Execution Agent."
+    ]
   },
   {
     "cycle_id": "SB-20260223-231727-UTC",
@@ -27,7 +31,9 @@
     "signal_outcome": null,
     "risk_outcome": null,
     "execution_outcome": null,
-    "notes": ["Swarm groups not registered. Missing registered_groups.json. Cannot trigger Signal Agent, Risk Agent, or Execution Agent."]
+    "notes": [
+      "Swarm groups not registered. Missing registered_groups.json. Cannot trigger Signal Agent, Risk Agent, or Execution Agent."
+    ]
   },
   {
     "cycle_id": "SB-20260223-232108-UTC",
@@ -37,7 +43,9 @@
     "signal_outcome": null,
     "risk_outcome": null,
     "execution_outcome": null,
-    "notes": ["Swarm infrastructure not configured. File /workspace/project/data/registered_groups.json does not exist. Cannot spawn Signal Agent, Risk Agent, or Execution Agent. Human intervention required to register swarm groups."]
+    "notes": [
+      "Swarm infrastructure not configured. File /workspace/project/data/registered_groups.json does not exist. Cannot spawn Signal Agent, Risk Agent, or Execution Agent. Human intervention required to register swarm groups."
+    ]
   },
   {
     "cycle_id": "SB-20260223-232523-UTC",
@@ -47,7 +55,9 @@
     "signal_outcome": "ERROR",
     "risk_outcome": null,
     "execution_outcome": null,
-    "notes": ["Signal Agent failed: Missing environment variables SIGMAGRID_API_KEY and SIGMAGRID_ENDPOINT. Operator credentials not configured. Human intervention required."]
+    "notes": [
+      "Signal Agent failed: Missing environment variables SIGMAGRID_API_KEY and SIGMAGRID_ENDPOINT. Operator credentials not configured. Human intervention required."
+    ]
   },
   {
     "cycle_id": "SB-20260223-232756-UTC",
@@ -57,7 +67,9 @@
     "signal_outcome": null,
     "risk_outcome": null,
     "execution_outcome": null,
-    "notes": ["Cannot spawn Signal Agent: Required environment variables SIGMAGRID_API_KEY and SIGMAGRID_ENDPOINT not configured. Signal Agent cannot fetch data from SigmaGrid API without credentials. Human intervention required to configure operator credentials."]
+    "notes": [
+      "Cannot spawn Signal Agent: Required environment variables SIGMAGRID_API_KEY and SIGMAGRID_ENDPOINT not configured. Signal Agent cannot fetch data from SigmaGrid API without credentials. Human intervention required to configure operator credentials."
+    ]
   },
   {
     "cycle_id": "SB-20260223-234436-UTC",
@@ -67,7 +79,9 @@
     "signal_outcome": null,
     "risk_outcome": null,
     "execution_outcome": null,
-    "notes": ["Cannot spawn subagents: Agent instruction files (Signal Agent, Risk Agent, Execution Agent CLAUDE.md files) do not exist. Orchestrator CLAUDE.md references embedding full agent instructions in Task tool prompts, but no source files found. Additionally, previous cycles indicate missing credentials (SIGMAGRID_API_KEY, SIGMAGRID_ENDPOINT). Architecture requires agent definitions before cycle execution. Human intervention required."]
+    "notes": [
+      "Cannot spawn subagents: Agent instruction files (Signal Agent, Risk Agent, Execution Agent CLAUDE.md files) do not exist. Orchestrator CLAUDE.md references embedding full agent instructions in Task tool prompts, but no source files found. Additionally, previous cycles indicate missing credentials (SIGMAGRID_API_KEY, SIGMAGRID_ENDPOINT). Architecture requires agent definitions before cycle execution. Human intervention required."
+    ]
   },
   {
     "cycle_id": "SB-20260223-234731-UTC",
@@ -77,7 +91,9 @@
     "signal_outcome": null,
     "risk_outcome": null,
     "execution_outcome": null,
-    "notes": ["Cannot spawn subagents: Agent instruction files do not exist in workspace. Orchestrator requires separate CLAUDE.md files for Signal Agent, Risk Agent, and Execution Agent to embed in Task tool prompts. Only /workspace/group/CLAUDE.md (Orchestrator instructions) exists. 8 consecutive cycles aborted. Human intervention required to create agent definition files or refactor architecture."]
+    "notes": [
+      "Cannot spawn subagents: Agent instruction files do not exist in workspace. Orchestrator requires separate CLAUDE.md files for Signal Agent, Risk Agent, and Execution Agent to embed in Task tool prompts. Only /workspace/group/CLAUDE.md (Orchestrator instructions) exists. 8 consecutive cycles aborted. Human intervention required to create agent definition files or refactor architecture."
+    ]
   },
   {
     "cycle_id": "SB-20260223-234858-UTC",
@@ -87,7 +103,9 @@
     "signal_outcome": null,
     "risk_outcome": null,
     "execution_outcome": null,
-    "notes": ["9 consecutive cycle failures. Agent definition files still missing. Orchestrator architecture requires Signal Agent, Risk Agent, and Execution Agent CLAUDE.md files to embed in Task tool prompts when spawning subagents. No agent definitions found in workspace. Critical: Human intervention required to either (1) create agent definition files or (2) refactor orchestrator to use inline agent instructions. Additionally, previous cycles indicate missing API credentials (SIGMAGRID_API_KEY, SIGMAGRID_ENDPOINT)."]
+    "notes": [
+      "9 consecutive cycle failures. Agent definition files still missing. Orchestrator architecture requires Signal Agent, Risk Agent, and Execution Agent CLAUDE.md files to embed in Task tool prompts when spawning subagents. No agent definitions found in workspace. Critical: Human intervention required to either (1) create agent definition files or (2) refactor orchestrator to use inline agent instructions. Additionally, previous cycles indicate missing API credentials (SIGMAGRID_API_KEY, SIGMAGRID_ENDPOINT)."
+    ]
   },
   {
     "cycle_id": "SB-20260223-235017-UTC",
@@ -97,7 +115,9 @@
     "signal_outcome": "ERROR",
     "risk_outcome": null,
     "execution_outcome": null,
-    "notes": ["Signal Agent returned error: API returned 404: No signal data available for SPY. SigmaGrid may be offline or SPY data temporarily unavailable."]
+    "notes": [
+      "Signal Agent returned error: API returned 404: No signal data available for SPY. SigmaGrid may be offline or SPY data temporarily unavailable."
+    ]
   },
   {
     "cycle_id": "SB-20260223-235213-UTC",
@@ -107,6 +127,440 @@
     "signal_outcome": null,
     "risk_outcome": null,
     "execution_outcome": null,
-    "notes": ["Previous cycle SB-20260223-235017-UTC still in progress. Skipping trigger."]
+    "notes": [
+      "Previous cycle SB-20260223-235017-UTC still in progress. Skipping trigger."
+    ]
+  },
+  {
+    "cycle_id": "SB-20260223-235308-UTC",
+    "started_at_utc": "2026-02-23T23:53:14Z",
+    "completed_at_utc": "2026-02-23T23:54:36Z",
+    "status": "ABORTED-SIGNAL-ERROR",
+    "signal_outcome": "ERROR",
+    "risk_outcome": null,
+    "execution_outcome": null,
+    "notes": [
+      "Signal Agent returned error: API returned 404: No signal data available for SPY. Second consecutive 404 from SigmaGrid. Service may be offline or SPY data unavailable."
+    ]
+  },
+  {
+    "cycle_id": "SB-20260223-235514-UTC",
+    "started_at_utc": "2026-02-23T23:55:21Z",
+    "completed_at_utc": "2026-02-23T23:57:37Z",
+    "status": "ABORTED-SIGNAL-ERROR",
+    "signal_outcome": "ERROR",
+    "risk_outcome": null,
+    "execution_outcome": null,
+    "notes": [
+      "Signal Agent returned error: No signal data available for SPY from SigmaGrid API. Third consecutive 404/no-data error. SigmaGrid may be offline or SPY data stream interrupted."
+    ]
+  },
+  {
+    "cycle_id": "SB-20260223-235817-UTC",
+    "started_at_utc": "2026-02-23T23:58:41Z",
+    "completed_at_utc": "2026-02-24T00:00:19Z",
+    "status": "ABORTED-SIGNAL-ERROR",
+    "signal_outcome": "ERROR",
+    "risk_outcome": null,
+    "execution_outcome": null,
+    "notes": [
+      "Signal Agent returned error: No signal data available for SPY - API returned 404. Fourth consecutive 404/no-data error from SigmaGrid API. Alert threshold reached (3+ consecutive failures)."
+    ]
+  },
+  {
+    "cycle_id": "SB-20260224-000100-UTC",
+    "started_at_utc": "2026-02-24T00:01:00Z",
+    "completed_at_utc": "2026-02-24T00:02:05Z",
+    "status": "ABORTED-SIGNAL-ERROR",
+    "signal_outcome": "ERROR",
+    "risk_outcome": null,
+    "execution_outcome": null,
+    "notes": [
+      "Signal Agent returned error: No signal data available for SPY - API returned 404. Fifth consecutive 404/no-data error from SigmaGrid API. Critical alert threshold exceeded (5+ consecutive failures)."
+    ]
+  },
+  {
+    "cycle_id": "SB-20260224-000312-UTC",
+    "started_at_utc": "2026-02-24T00:03:20Z",
+    "completed_at_utc": "2026-02-24T00:04:34Z",
+    "status": "ABORTED-SIGNAL-ERROR",
+    "signal_outcome": "ERROR",
+    "risk_outcome": null,
+    "execution_outcome": null,
+    "notes": [
+      "Signal Agent returned error: No signal data available for SPY from SigmaGrid API. Sixth consecutive 404/no-data error. CRITICAL: SigmaGrid data feed appears to be down or SPY data stream interrupted. Human intervention required."
+    ]
+  },
+  {
+    "cycle_id": "SB-20260224-150145-UTC",
+    "started_at_utc": "2026-02-24T15:01:52Z",
+    "completed_at_utc": "2026-02-24T15:03:40Z",
+    "status": "ABORTED-SIGNAL-ERROR",
+    "signal_outcome": "ERROR",
+    "risk_outcome": null,
+    "execution_outcome": null,
+    "notes": [
+      "Signal Agent returned error: No signal data available for SPY from SigmaGrid API. SEVENTH consecutive 404/no-data error. CRITICAL: SigmaGrid data feed appears to be down or SPY data stream interrupted. Human intervention required."
+    ]
+  },
+  {
+    "cycle_id": "SB-20260224-150420-UTC",
+    "started_at_utc": "2026-02-24T15:04:45Z",
+    "completed_at_utc": "2026-02-24T15:07:04Z",
+    "status": "ABORTED-SIGNAL-ERROR",
+    "signal_outcome": "ERROR",
+    "risk_outcome": null,
+    "execution_outcome": null,
+    "notes": [
+      "Signal Agent returned error: No signal data available for SPY (API returned 404). EIGHTH consecutive 404/no-data error from SigmaGrid API. CRITICAL ALERT: SigmaGrid data feed appears to be down or SPY data stream interrupted for >15 hours. Human intervention urgently required."
+    ]
+  },
+  {
+    "cycle_id": "SB-20260224-150753-UTC",
+    "started_at_utc": "2026-02-24T15:08:13Z",
+    "completed_at_utc": "2026-02-24T15:09:42Z",
+    "status": "ABORTED-CREDENTIALS-MISSING",
+    "signal_outcome": "ERROR",
+    "risk_outcome": null,
+    "execution_outcome": null,
+    "notes": [
+      "Signal Agent returned error: Missing environment variable SIGMAGRID_API_KEY. NINTH consecutive credentials error. CRITICAL: SigmaGrid operator credentials not configured. Human intervention urgently required to set SIGMAGRID_API_KEY and SIGMAGRID_ENDPOINT environment variables."
+    ]
+  },
+  {
+    "cycle_id": "SB-20260224-151017-UTC",
+    "started_at_utc": "2026-02-24T15:10:48Z",
+    "completed_at_utc": "2026-02-24T15:12:42Z",
+    "status": "ABORTED-SIGNAL-ERROR",
+    "signal_outcome": "ERROR",
+    "risk_outcome": null,
+    "execution_outcome": null,
+    "notes": [
+      "Signal Agent returned error: No signal data available for SPY from SigmaGrid API (404). TENTH consecutive signal error. CRITICAL: SigmaGrid data feed has been unavailable for >16 hours. Human intervention urgently required."
+    ]
+  },
+  {
+    "cycle_id": "SB-20260224-151325-UTC",
+    "started_at_utc": "2026-02-24T15:13:55Z",
+    "completed_at_utc": "2026-02-24T15:15:31Z",
+    "status": "ABORTED-CREDENTIALS-MISSING",
+    "signal_outcome": "ERROR",
+    "risk_outcome": null,
+    "execution_outcome": null,
+    "notes": [
+      "Signal Agent returned error: Missing environment variable SIGMAGRID_API_KEY. ELEVENTH consecutive credentials/signal error. CRITICAL ALERT: SigmaGrid operator credentials not configured. Human intervention urgently required to set SIGMAGRID_API_KEY and SIGMAGRID_ENDPOINT environment variables."
+    ]
+  },
+  {
+    "cycle_id": "SB-20260224-151612-UTC",
+    "started_at_utc": "2026-02-24T15:16:39Z",
+    "completed_at_utc": "2026-02-24T15:18:25Z",
+    "status": "ABORTED-SIGNAL-ERROR",
+    "signal_outcome": "ERROR",
+    "risk_outcome": null,
+    "execution_outcome": null,
+    "notes": [
+      "Signal Agent returned error: SigmaGrid API returned 404 - No signal data available for SPY. TWELFTH consecutive 404/no-data error from SigmaGrid API. CRITICAL ALERT: SigmaGrid data feed has been down for >16 hours. Human intervention urgently required."
+    ]
+  },
+  {
+    "cycle_id": "SB-20260224-151913-UTC",
+    "started_at_utc": "2026-02-24T15:19:41Z",
+    "completed_at_utc": "2026-02-24T15:21:50Z",
+    "status": "ABORTED-SIGNAL-ERROR",
+    "signal_outcome": "ERROR",
+    "risk_outcome": null,
+    "execution_outcome": null,
+    "notes": [
+      "Signal Agent returned error: SigmaGrid API returned 404 - No signal data available for SPY. THIRTEENTH consecutive 404/no-data error from SigmaGrid API. CRITICAL ALERT: SigmaGrid data feed has been down for >16 hours. Human intervention urgently required."
+    ]
+  },
+  {
+    "cycle_id": "SB-20260224-152247-UTC",
+    "started_at_utc": "2026-02-24T15:22:47Z",
+    "completed_at_utc": "2026-02-24T15:22:47Z",
+    "status": "ABORTED-AGENT-DEFINITIONS-MISSING",
+    "signal_outcome": null,
+    "risk_outcome": null,
+    "execution_outcome": null,
+    "notes": [
+      "FOURTEENTH consecutive cycle failure. Agent instruction files still do not exist at /workspace/group/agents/sigmaboy-signal/CLAUDE.md, /workspace/group/agents/sigmaboy-risk/CLAUDE.md, /workspace/group/agents/sigmaboy-execution/CLAUDE.md. Orchestrator architecture requires these files to embed as context when spawning subagents via Task tool. Infrastructure is not operational. CRITICAL: Human intervention required to create agent definition files. Additionally, SigmaGrid API credentials (SIGMAGRID_API_KEY, SIGMAGRID_ENDPOINT) remain missing based on previous cycle errors."
+    ]
+  },
+  {
+    "cycle_id": "SB-20260224-152405-UTC",
+    "started_at_utc": "2026-02-24T15:24:21Z",
+    "completed_at_utc": "2026-02-24T15:25:37Z",
+    "status": "ABORTED-SIGNAL-ERROR",
+    "signal_outcome": "ERROR",
+    "risk_outcome": null,
+    "execution_outcome": null,
+    "notes": [
+      "Signal Agent returned error: No signal data available for SPY from SigmaGrid API. FIFTEENTH consecutive signal error. CRITICAL ALERT: SigmaGrid data feed has been unavailable for >16 hours. Human intervention urgently required."
+    ]
+  },
+  {
+    "cycle_id": "SB-20260224-152651-UTC",
+    "started_at_utc": "2026-02-24T15:26:57Z",
+    "completed_at_utc": "2026-02-24T15:29:40Z",
+    "status": "ABORTED-SIGNAL-ERROR",
+    "signal_outcome": "ERROR",
+    "risk_outcome": null,
+    "execution_outcome": null,
+    "notes": [
+      "Signal Agent returned error: No signal data available for SPY from SigmaGrid API (404). 2th consecutive signal/credentials error. CRITICAL ALERT: SigmaGrid data feed has been unavailable for >17 hours. Human intervention urgently required."
+    ]
+  },
+  {
+    "cycle_id": "SB-20260224-153022-UTC",
+    "started_at_utc": "2026-02-24T15:30:42Z",
+    "completed_at_utc": "2026-02-24T15:31:59Z",
+    "status": "ABORTED-SIGNAL-ERROR",
+    "signal_outcome": "ERROR",
+    "risk_outcome": null,
+    "execution_outcome": null,
+    "notes": [
+      "Signal Agent returned error: SigmaGrid API returned 404 - No signal data available for SPY. SEVENTEENTH consecutive 404/no-data error from SigmaGrid API. CRITICAL ALERT: SigmaGrid data feed has been unavailable for >17 hours. Human intervention urgently required."
+    ]
+  },
+  {
+    "cycle_id": "SB-20260224-153313-UTC",
+    "started_at_utc": "2026-02-24T15:33:13Z",
+    "completed_at_utc": "2026-02-24T15:34:32Z",
+    "status": "ABORTED-SIGNAL-ERROR",
+    "signal_outcome": "ERROR",
+    "risk_outcome": null,
+    "execution_outcome": null,
+    "notes": [
+      "Signal Agent returned error: No signal data available for SPY from SigmaGrid API. EIGHTEENTH consecutive 404/no-data error from SigmaGrid API. CRITICAL ALERT: SigmaGrid data feed has been unavailable for >17 hours. Human intervention urgently required."
+    ]
+  },
+  {
+    "cycle_id": "SB-20260224-153540-UTC",
+    "started_at_utc": "2026-02-24T15:36:29Z",
+    "completed_at_utc": "2026-02-24T15:38:06Z",
+    "status": "ABORTED-SIGNAL-ERROR",
+    "signal_outcome": "ERROR",
+    "risk_outcome": null,
+    "execution_outcome": null,
+    "notes": [
+      "Signal Agent returned error: No signal data available for SPY from SigmaGrid API. NINETEENTH consecutive 404/no-data error from SigmaGrid API. CRITICAL ALERT: SigmaGrid data feed has been unavailable for >17 hours. Human intervention urgently required."
+    ]
+  },
+  {
+    "cycle_id": "SB-20260224-154009-UTC",
+    "started_at_utc": "2026-02-24T15:40:09Z",
+    "completed_at_utc": "2026-02-24T15:41:29Z",
+    "status": "ABORTED-SIGNAL-ERROR",
+    "signal_outcome": "ERROR",
+    "risk_outcome": null,
+    "execution_outcome": null,
+    "notes": [
+      "Signal Agent returned error: SigmaGrid API unavailable - 404 Not Found at endpoint https://api.sigmagrid.app/v1/signal/SPY. TWENTIETH consecutive 404/no-data error from SigmaGrid API. CRITICAL ALERT: SigmaGrid data feed has been unavailable for >17 hours. Human intervention urgently required."
+    ]
+  },
+  {
+    "cycle_id": "SB-20260224-154219-UTC",
+    "started_at_utc": "2026-02-24T15:42:19Z",
+    "completed_at_utc": "2026-02-24T15:44:30Z",
+    "status": "ABORTED-SIGNAL-ERROR",
+    "signal_outcome": "ERROR",
+    "risk_outcome": null,
+    "execution_outcome": null,
+    "notes": [
+      "Signal Agent returned error: SigmaGrid API returned 404 - No signal data available for SPY. TWENTY-FIRST consecutive 404/no-data error from SigmaGrid API. CRITICAL ALERT: SigmaGrid data feed has been unavailable for >17 hours. Human intervention urgently required."
+    ]
+  },
+  {
+    "cycle_id": "SB-20260224-154510-UTC",
+    "started_at_utc": "2026-02-24T15:45:19Z",
+    "completed_at_utc": "2026-02-24T15:47:32Z",
+    "status": "ABORTED-SIGNAL-ERROR",
+    "signal_outcome": "ERROR",
+    "risk_outcome": null,
+    "execution_outcome": null,
+    "notes": [
+      "Signal Agent returned error: No signal data available for SPY from SigmaGrid API (404). TWENTY-SECOND consecutive 404/no-data error from SigmaGrid API. CRITICAL ALERT: SigmaGrid data feed has been unavailable for >17 hours. Human intervention urgently required."
+    ]
+  },
+  {
+    "cycle_id": "SB-20260224-154819-UTC",
+    "started_at_utc": "2026-02-24T15:48:41Z",
+    "completed_at_utc": "2026-02-24T15:50:22Z",
+    "status": "ABORTED-CREDENTIALS-MISSING",
+    "signal_outcome": "ERROR",
+    "risk_outcome": null,
+    "execution_outcome": null,
+    "notes": [
+      "Signal Agent returned error: Missing environment variable SIGMAGRID_API_KEY. TWENTY-THIRD consecutive credentials/signal error. CRITICAL: SigmaGrid operator credentials not configured. Human intervention urgently required to set SIGMAGRID_API_KEY and SIGMAGRID_ENDPOINT environment variables."
+    ]
+  },
+  {
+    "cycle_id": "SB-20260224-155102-UTC",
+    "started_at_utc": "2026-02-24T15:51:07Z",
+    "completed_at_utc": "2026-02-24T15:53:16Z",
+    "status": "ABORTED-CREDENTIALS-MISSING",
+    "signal_outcome": "ERROR",
+    "risk_outcome": null,
+    "execution_outcome": null,
+    "notes": [
+      "Signal Agent returned error: Missing environment variable SIGMAGRID_API_KEY. 33th consecutive credentials/signal error. CRITICAL: SigmaGrid operator credentials not configured. Human intervention urgently required to set SIGMAGRID_API_KEY and SIGMAGRID_ENDPOINT environment variables."
+    ]
+  },
+  {
+    "cycle_id": "SB-20260224-155414-UTC",
+    "started_at_utc": "2026-02-24T15:54:28Z",
+    "completed_at_utc": "2026-02-24T15:56:06Z",
+    "status": "ABORTED-SIGNAL-ERROR",
+    "signal_outcome": "ERROR",
+    "risk_outcome": null,
+    "execution_outcome": null,
+    "notes": [
+      "Signal Agent returned error: API returned: No signal data available for SPY. TWENTY-FIFTH consecutive signal/credentials error. CRITICAL ALERT: SigmaGrid data feed has been unavailable for >18 hours. Human intervention urgently required."
+    ]
+  },
+  {
+    "cycle_id": "SB-20260224-155654-UTC",
+    "started_at_utc": "2026-02-24T15:57:35Z",
+    "completed_at_utc": "2026-02-24T15:59:27Z",
+    "status": "ABORTED-SIGNAL-ERROR",
+    "signal_outcome": "ERROR",
+    "risk_outcome": null,
+    "execution_outcome": null,
+    "notes": [
+      "Signal Agent returned error: API returned 404: No signal data available for SPY. TWENTY-SIXTH consecutive 404/no-data error from SigmaGrid API. CRITICAL ALERT: SigmaGrid data feed has been unavailable for >18 hours. Human intervention urgently required."
+    ]
+  },
+  {
+    "cycle_id": "SB-20260224-160016-UTC",
+    "started_at_utc": "2026-02-24T16:00:51Z",
+    "completed_at_utc": "2026-02-24T16:03:06Z",
+    "status": "ABORTED-SIGNAL-ERROR",
+    "signal_outcome": "ERROR",
+    "risk_outcome": null,
+    "execution_outcome": null,
+    "notes": [
+      "Signal Agent returned error: No signal data available for SPY from SigmaGrid API. TWENTY-SEVENTH consecutive 404/no-data error from SigmaGrid API. CRITICAL ALERT: SigmaGrid data feed has been unavailable for >18 hours. Human intervention urgently required."
+    ]
+  },
+  {
+    "cycle_id": "SB-20260224-160340-UTC",
+    "started_at_utc": "2026-02-24T16:03:46Z",
+    "completed_at_utc": "2026-02-24T16:09:05Z",
+    "status": "ABORTED-STUCK-CYCLE",
+    "signal_outcome": "ERROR",
+    "risk_outcome": null,
+    "execution_outcome": null,
+    "notes": [
+      "Cycle stuck in IN-PROGRESS state for >5 minutes. Marked as failed by Orchestrator to unblock subsequent triggers. Likely Signal Agent timeout or infrastructure issue."
+    ]
+  },
+  {
+    "cycle_id": "SB-20260224-160443-UTC",
+    "started_at_utc": "2026-02-24T16:04:43Z",
+    "completed_at_utc": "2026-02-24T16:04:43Z",
+    "status": "SKIPPED-CYCLE-IN-PROGRESS",
+    "signal_outcome": null,
+    "risk_outcome": null,
+    "execution_outcome": null,
+    "notes": [
+      "Previous cycle SB-20260224-160340-UTC still in progress (started 2026-02-24T16:03:46Z). Skipping scheduled trigger."
+    ]
+  },
+  {
+    "cycle_id": "SB-20260224-160538-UTC",
+    "started_at_utc": "2026-02-24T16:05:29Z",
+    "completed_at_utc": "2026-02-24T16:05:29Z",
+    "status": "SKIPPED-CYCLE-IN-PROGRESS",
+    "signal_outcome": null,
+    "risk_outcome": null,
+    "execution_outcome": null,
+    "notes": [
+      "Previous cycle SB-20260224-160340-UTC still in progress (started 2026-02-24T16:03:46Z, no completed_at_utc timestamp). Skipping scheduled trigger to avoid overlapping cycles."
+    ]
+  },
+  {
+    "cycle_id": "SB-20260224-160613-UTC",
+    "started_at_utc": "2026-02-24T16:06:26Z",
+    "completed_at_utc": "2026-02-24T16:06:26Z",
+    "status": "SKIPPED-CYCLE-IN-PROGRESS",
+    "signal_outcome": null,
+    "risk_outcome": null,
+    "execution_outcome": null,
+    "notes": [
+      "Previous cycle SB-20260224-160340-UTC still in progress (started 2026-02-24T16:03:46Z, no completed_at_utc timestamp). Skipping scheduled trigger to avoid overlapping cycles."
+    ]
+  },
+  {
+    "cycle_id": "SB-20260224-160710-UTC",
+    "started_at_utc": "2026-02-24T16:07:10Z",
+    "completed_at_utc": "2026-02-24T16:07:10Z",
+    "status": "SKIPPED-CYCLE-IN-PROGRESS",
+    "signal_outcome": null,
+    "risk_outcome": null,
+    "execution_outcome": null,
+    "notes": [
+      "Previous cycle SB-20260224-160340-UTC still in progress (started 2026-02-24T16:03:46Z, no completed_at_utc timestamp). Skipping scheduled trigger to avoid overlapping cycles."
+    ]
+  },
+  {
+    "cycle_id": "SB-20260224-160908-UTC",
+    "started_at_utc": "2026-02-24T16:09:05Z",
+    "completed_at_utc": "2026-02-24T16:09:05Z",
+    "status": "SKIPPED-CYCLE-IN-PROGRESS",
+    "signal_outcome": null,
+    "risk_outcome": null,
+    "execution_outcome": null,
+    "notes": [
+      "Previous cycle SB-20260224-160340-UTC still in progress (started 2026-02-24T16:03:46Z, no completed_at_utc timestamp). Skipping scheduled trigger to avoid overlapping cycles. This is the 5th consecutive skipped trigger due to stuck cycle."
+    ]
+  },
+  {
+    "cycle_id": "SB-20260224-161009-UTC",
+    "started_at_utc": "2026-02-24T16:10:41Z",
+    "completed_at_utc": "2026-02-24T16:11:49Z",
+    "status": "ABORTED-CREDENTIALS-MISSING",
+    "signal_outcome": "ERROR",
+    "risk_outcome": null,
+    "execution_outcome": null,
+    "notes": [
+      "Signal Agent returned error: Missing environment variable SIGMAGRID_API_KEY. TWENTY-NINTH consecutive credentials/signal error. CRITICAL: SigmaGrid operator credentials not configured. Human intervention urgently required to set SIGMAGRID_API_KEY and SIGMAGRID_ENDPOINT environment variables."
+    ]
+  },
+  {
+    "cycle_id": "SB-20260224-161230-UTC",
+    "started_at_utc": "2026-02-24T16:12:35Z",
+    "completed_at_utc": "2026-02-24T16:14:22Z",
+    "status": "ABORTED-CREDENTIALS-MISSING",
+    "signal_outcome": "ERROR",
+    "risk_outcome": null,
+    "execution_outcome": null,
+    "notes": [
+      "Signal Agent returned error: Missing environment variable SIGMAGRID_API_KEY. THIRTIETH consecutive credentials/signal error. CRITICAL: SigmaGrid operator credentials not configured. Human intervention urgently required to set SIGMAGRID_API_KEY and SIGMAGRID_ENDPOINT environment variables."
+    ]
+  },
+  {
+    "cycle_id": "SB-20260224-161515-UTC",
+    "started_at_utc": "2026-02-24T16:15:05Z",
+    "completed_at_utc": "2026-02-24T16:17:17Z",
+    "status": "ABORTED-SIGNAL-ERROR",
+    "signal_outcome": "ERROR",
+    "risk_outcome": null,
+    "execution_outcome": null,
+    "notes": [
+      "Signal Agent authenticated successfully (operator access confirmed) but SigmaGrid API returned: 'No signal data available for SPY'. Multiple endpoints attempted (/v1/signal/SPY, /v1/signals/SPY, /v1/fair-value/SPY). THIRTY-FIRST consecutive signal error. CRITICAL ALERT: SigmaGrid data feed has been unavailable for >18 hours. Human intervention urgently required."
+    ]
+  },
+  {
+    "cycle_id": "SB-20260224-161821-UTC",
+    "started_at_utc": "2026-02-24T16:18:33Z",
+    "completed_at_utc": "2026-02-24T16:21:23Z",
+    "status": "ABORTED-SIGNAL-ERROR",
+    "signal_outcome": "ERROR",
+    "risk_outcome": null,
+    "execution_outcome": null,
+    "notes": [
+      "Signal Agent returned error: No signal data available for SPY from SigmaGrid API. Multiple endpoints attempted. THIRTY-SECOND consecutive signal/credentials error. CRITICAL ALERT: SigmaGrid data feed has been unavailable for >18 hours. Human intervention urgently required."
+    ]
   }
 ]

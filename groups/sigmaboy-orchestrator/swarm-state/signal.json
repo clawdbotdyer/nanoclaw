@@ -1,7 +1,13 @@
 {
-  "cycle_id": "SB-20260223-235017-UTC",
+  "cycle_id": "SB-20260224-161821-UTC",
   "status": "ERROR",
-  "error": "API returned 404: No signal data available for SPY",
-  "fetched_at_utc": "2026-02-23T23:50:17Z",
-  "operator_access": true
+  "error": "No signal data available for SPY - SigmaGrid API returned: 'No signal data available for SPY'",
+  "fetched_at_utc": "2026-02-24T16:20:42Z",
+  "operator_access": true,
+  "api_endpoint": "sigmagrid",
+  "attempted_endpoints": [
+    "https://api.sigmagrid.app/v1/signal/SPY",
+    "https://api.sigmagrid.app/v1/signals/SPY",
+    "https://api.sigmagrid.app/v1/fair-value/SPY"
+  ]
 }
