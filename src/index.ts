@@ -562,15 +562,21 @@ async function main(): Promise<void> {
 
   // Create and connect channels
   if (!TELEGRAM_ONLY) {
+    logger.info('Connecting to WhatsApp');
     whatsapp = new WhatsAppChannel(channelOpts);
     channels.push(whatsapp);
     await whatsapp.connect();
+  } else {
+    logger.info('WhatsApp disabled (TELEGRAM_ONLY=true)');
   }
 
   if (TELEGRAM_BOT_TOKEN) {
+    logger.info('Connecting to Telegram');
     const telegram = new TelegramChannel(TELEGRAM_BOT_TOKEN, channelOpts);
     channels.push(telegram);
     await telegram.connect();
+  } else {
+    logger.warn('Telegram disabled (no TELEGRAM_BOT_TOKEN)');
   }
 
   // Start subsystems (independently of connection handler)
