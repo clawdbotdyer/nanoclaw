@@ -16,10 +16,13 @@ const MESSAGES_DIR = path.join(IPC_DIR, 'messages');
 const TASKS_DIR = path.join(IPC_DIR, 'tasks');
 
 // Context from environment variables (set by the agent runner)
-const chatJid = process.env.NANOCLAW_CHAT_JID!;
-const groupFolder = process.env.NANOCLAW_GROUP_FOLDER!;
+const chatJid = process.env.NANOCLAW_CHAT_JID || 'unknown@g.us';
+const groupFolder = process.env.NANOCLAW_GROUP_FOLDER || 'unknown';
 const isMain = process.env.NANOCLAW_IS_MAIN === '1';
 const userId = chatJid.split('@')[0]; // Extract user ID from JID
+
+// Debug logging
+console.error(`[MCP] Initialized with chatJid=${chatJid}, groupFolder=${groupFolder}, isMain=${isMain}`);
 
 function writeIpcFile(dir: string, data: object): string {
   fs.mkdirSync(dir, { recursive: true });
