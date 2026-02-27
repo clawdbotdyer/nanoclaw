@@ -168,7 +168,15 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
   const prompt = formatMessages(missedMessages);
 
   // Extract userId and get Honcho context
-  const userId = missedMessages[0]?.sender?.split('@')[0] || 'unknown';
+  // For Telegram: extract numeric ID from "tg:123456"
+  // For WhatsApp: extract ID from "123456@s.whatsapp.net" or similar
+  const sender = missedMessages[0]?.sender || 'unknown';
+  let userId: string;
+  if (sender.startsWith('tg:')) {
+    userId = sender.substring(3); // Extract number from "tg:426342486" -> "426342486"
+  } else {
+    userId = sender.split('@')[0]; // For WhatsApp, get part before @
+  }
   const honchoContext = await getHonchoContext(userId, group.folder);
   const augmentedPrompt = honchoContext
     ? `${prompt}\n\n---\n${honchoContext}`

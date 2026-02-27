@@ -10,7 +10,7 @@ import { z } from 'zod';
 import fs from 'fs';
 import path from 'path';
 import { CronExpressionParser } from 'cron-parser';
-import Honcho from 'honcho-ai';
+import { Honcho } from '@honcho-ai/sdk';
 
 const IPC_DIR = '/workspace/ipc';
 const MESSAGES_DIR = path.join(IPC_DIR, 'messages');
@@ -20,7 +20,16 @@ const TASKS_DIR = path.join(IPC_DIR, 'tasks');
 const chatJid = process.env.NANOCLAW_CHAT_JID || 'unknown@g.us';
 const groupFolder = process.env.NANOCLAW_GROUP_FOLDER || 'unknown';
 const isMain = process.env.NANOCLAW_IS_MAIN === '1';
-const userId = chatJid.split('@')[0]; // Extract user ID from JID
+
+// Extract user ID from JID
+// For Telegram: extract numeric ID from "tg:123456" -> "123456"
+// For WhatsApp: extract ID from "123456@s.whatsapp.net" -> "123456"
+let userId: string;
+if (chatJid.startsWith('tg:')) {
+  userId = chatJid.substring(3); // Extract number from "tg:426342486"
+} else {
+  userId = chatJid.split('@')[0]; // For WhatsApp, get part before @
+}
 
 // Honcho configuration
 const HONCHO_API_KEY = process.env.HONCHO_API_KEY ?? '';
@@ -40,31 +49,10 @@ function getHoncho(): Honcho {
   if (!_honcho) {
     _honcho = new Honcho({
       apiKey: HONCHO_API_KEY,
-      environment: 'production',
+      environment: 'production', // Use Honcho Cloud (https://api.honcho.dev)
     });
   }
   return _honcho;
-}
-
-async function getAppId(): Promise<string> {
-  if (_appId) return _appId;
-
-  try {
-    const honcho = getHoncho();
-    const app = await honcho.apps.getByName(HONCHO_WORKSPACE);
-    _appId = app.id;
-    return _appId;
-  } catch (err) {
-    try {
-      const honcho = getHoncho();
-      const app = await honcho.apps.create({ name: HONCHO_WORKSPACE });
-      _appId = app.id;
-      return _appId;
-    } catch (createErr) {
-      console.error('[honcho] Failed to get or create app:', createErr);
-      throw createErr;
-    }
-  }
 }
 
 function isHonchoEnabled(): boolean {
@@ -73,25 +61,23 @@ function isHonchoEnabled(): boolean {
 
 async function getOrCreateSession(userId: string) {
   const honcho = getHoncho();
-  const appId = await getAppId();
+  console.error(`[honcho-mcp] getOrCreateSession: Creating/getting peer userId=${userId}...`);
 
-  // Get or create the user
-  const user = await honcho.apps.users.getOrCreate(appId, userId);
+  // Get or create the peer (user)
+  const peer = await honcho.peer(userId);
+  console.error(`[honcho-mcp] getOrCreateSession: Got peer=${userId}`);
 
-  // Try to get or create a session for this group
-  let session;
-  try {
-    session = await honcho.apps.users.sessions.get(appId, user.id, {
-      session_id: groupFolder,
-    });
-  } catch {
-    // Session doesn't exist, create it
-    session = await honcho.apps.users.sessions.create(appId, user.id, {
-      metadata: { group: groupFolder },
-    });
-  }
+  // Session ID is based on group folder for consistency
+  const sessionId = `${groupFolder}`;
+  console.error(`[honcho-mcp] getOrCreateSession: Getting/creating session=${sessionId}...`);
 
-  return { user, session, appId };
+  // Get or create a session for this group
+  const session = await honcho.session(sessionId, {
+    metadata: { group: groupFolder },
+  });
+  console.error(`[honcho-mcp] getOrCreateSession: Got session=${sessionId}`);
+
+  return { peer, session };
 }
 
 // Debug logging
@@ -372,18 +358,18 @@ try {
       }
 
       try {
-        const { user, session, appId } = await getOrCreateSession(userId);
-        const response = await getHoncho().apps.users.sessions.chat(
-          appId,
-          user.id,
-          session.id,
-          { queries: args.question },
-        );
+        console.error(`[honcho_recall] Starting recall for user=${userId}, group=${groupFolder}...`);
+        const { peer, session } = await getOrCreateSession(userId);
+        console.error(`[honcho_recall] Got session, querying with question...`);
+        await session.addPeers(peer);
+        const response = await peer.chat(args.question, { session });
+        console.error(`[honcho_recall] Got response from Honcho`);
 
-        return { content: [{ type: 'text' as const, text: response.content || 'No information found.' }] };
+        return { content: [{ type: 'text' as const, text: response || 'No information found.' }] };
       } catch (err) {
         const errMsg = err instanceof Error ? err.message : String(err);
-        console.error('[honcho_recall] Full error:', JSON.stringify({ message: errMsg, name: err instanceof Error ? err.name : 'unknown' }, null, 2));
+        const errStack = err instanceof Error ? err.stack : '';
+        console.error('[honcho_recall] Full error:', JSON.stringify({ message: errMsg, name: err instanceof Error ? err.name : 'unknown', stack: errStack }, null, 2));
         return { content: [{ type: 'text' as const, text: `Honcho query failed: ${errMsg}` }], isError: true };
       }
     },
@@ -403,16 +389,12 @@ try {
       }
 
       try {
-        const { user, session, appId } = await getOrCreateSession(userId);
+        const { peer, session } = await getOrCreateSession(userId);
         // Use chat with a search-framed query
-        const response = await getHoncho().apps.users.sessions.chat(
-          appId,
-          user.id,
-          session.id,
-          { queries: `Search for: ${args.query}` },
-        );
+        await session.addPeers(peer);
+        const response = await peer.chat(`Search for: ${args.query}`, { session });
 
-        return { content: [{ type: 'text' as const, text: response.content || 'No results found.' }] };
+        return { content: [{ type: 'text' as const, text: response || 'No results found.' }] };
       } catch (err) {
         console.error('[honcho_search] Error:', err);
         return { content: [{ type: 'text' as const, text: `Search failed: ${err instanceof Error ? err.message : 'Unknown error'}` }], isError: true };
@@ -434,20 +416,17 @@ try {
       }
 
       try {
-        const { user, session, appId } = await getOrCreateSession(userId);
-        const messages = await getHoncho().apps.users.sessions.messages.list(
-          appId,
-          user.id,
-          session.id,
-          { size: 20, reverse: true },
-        );
+        const { peer, session } = await getOrCreateSession(userId);
+        const messagesPage = await session.messages();
+        const messages = messagesPage.items || [];
 
         const lines: string[] = [];
-        if (messages.items && messages.items.length > 0) {
+        if (messages && messages.length > 0) {
           lines.push('## Recent conversation context from Honcho');
-          // Reverse to get chronological order
-          for (const msg of messages.items.reverse()) {
-            const role = msg.is_user ? 'User' : 'Assistant';
+          // Show recent messages (last 20 items)
+          const recentMessages = messages.slice(Math.max(0, messages.length - 20));
+          for (const msg of recentMessages) {
+            const role = msg.peerId === peer.id ? 'User' : 'Assistant';
             lines.push(`${role}: ${msg.content}`);
           }
         }
