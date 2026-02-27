@@ -10,6 +10,7 @@ import { z } from 'zod';
 import fs from 'fs';
 import path from 'path';
 import { CronExpressionParser } from 'cron-parser';
+import Honcho from 'honcho-ai';
 
 const IPC_DIR = '/workspace/ipc';
 const MESSAGES_DIR = path.join(IPC_DIR, 'messages');
@@ -21,8 +22,81 @@ const groupFolder = process.env.NANOCLAW_GROUP_FOLDER || 'unknown';
 const isMain = process.env.NANOCLAW_IS_MAIN === '1';
 const userId = chatJid.split('@')[0]; // Extract user ID from JID
 
+// Honcho configuration
+const HONCHO_API_KEY = process.env.HONCHO_API_KEY ?? '';
+const HONCHO_WORKSPACE = process.env.HONCHO_WORKSPACE ?? 'nanoclaw';
+const HONCHO_GROUPS = new Set(
+  (process.env.HONCHO_GROUPS ?? '')
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean),
+);
+
+// Lazy Honcho client (only created if tools are called)
+let _honcho: Honcho | null = null;
+let _appId: string | null = null;
+
+function getHoncho(): Honcho {
+  if (!_honcho) {
+    _honcho = new Honcho({
+      apiKey: HONCHO_API_KEY,
+    });
+  }
+  return _honcho;
+}
+
+async function getAppId(): Promise<string> {
+  if (_appId) return _appId;
+
+  try {
+    const honcho = getHoncho();
+    const app = await honcho.apps.getByName(HONCHO_WORKSPACE);
+    _appId = app.id;
+    return _appId;
+  } catch (err) {
+    try {
+      const honcho = getHoncho();
+      const app = await honcho.apps.create({ name: HONCHO_WORKSPACE });
+      _appId = app.id;
+      return _appId;
+    } catch (createErr) {
+      console.error('[honcho] Failed to get or create app:', createErr);
+      throw createErr;
+    }
+  }
+}
+
+function isHonchoEnabled(): boolean {
+  return HONCHO_GROUPS.has(groupFolder) && !!HONCHO_API_KEY;
+}
+
+async function getOrCreateSession(userId: string) {
+  const honcho = getHoncho();
+  const appId = await getAppId();
+
+  // Get or create the user
+  const user = await honcho.apps.users.getOrCreate(appId, userId);
+
+  // Try to get or create a session for this group
+  let session;
+  try {
+    session = await honcho.apps.users.sessions.get(appId, user.id, {
+      session_id: groupFolder,
+    });
+  } catch {
+    // Session doesn't exist, create it
+    session = await honcho.apps.users.sessions.create(appId, user.id, {
+      metadata: { group: groupFolder },
+    });
+  }
+
+  return { user, session, appId };
+}
+
 // Debug logging
 console.error(`[MCP] Initialized with chatJid=${chatJid}, groupFolder=${groupFolder}, isMain=${isMain}`);
+console.error(`[MCP] Honcho enabled: ${isHonchoEnabled()}`);
+console.error(`[MCP] Starting tool registration...`);
 
 function writeIpcFile(dir: string, data: object): string {
   fs.mkdirSync(dir, { recursive: true });
@@ -38,10 +112,12 @@ function writeIpcFile(dir: string, data: object): string {
   return filename;
 }
 
+console.error(`[MCP] Creating McpServer...`);
 const server = new McpServer({
   name: 'nanoclaw',
   version: '1.0.0',
 });
+console.error(`[MCP] McpServer created, registering tools...`);
 
 server.tool(
   'send_message',
@@ -284,63 +360,107 @@ Use available_groups.json to find the JID for a group. The folder name should be
   },
 );
 
-server.tool(
-  'honcho_recall',
-  'Ask Honcho a question about this user. Example: "What are their main interests?"',
-  {
-    question: z.string().describe('Question about the user'),
-  },
-  async (args) => {
-    const data = {
-      type: 'honcho_query',
-      question: args.question,
-      userId,
-      groupFolder,
-      chatJid,
-      timestamp: new Date().toISOString(),
-    };
-    writeIpcFile(MESSAGES_DIR, data);
-    return { content: [{ type: 'text' as const, text: 'Honcho query submitted.' }] };
-  },
-);
+try {
+  server.tool(
+    'honcho_recall',
+    'Ask Honcho a question about this user.',
+    { question: z.string() },
+    async (args) => {
+      if (!isHonchoEnabled()) {
+        return { content: [{ type: 'text' as const, text: 'Honcho is not enabled for this group.' }] };
+      }
 
-server.tool(
-  'honcho_search',
-  'Search Honcho observations about this user.',
-  {
-    query: z.string().describe('Search query'),
-  },
-  async (args) => {
-    const data = {
-      type: 'honcho_search',
-      query: args.query,
-      topK: 5,
-      userId,
-      groupFolder,
-      chatJid,
-      timestamp: new Date().toISOString(),
-    };
-    writeIpcFile(MESSAGES_DIR, data);
-    return { content: [{ type: 'text' as const, text: 'Honcho search submitted.' }] };
-  },
-);
+      try {
+        const { user, session, appId } = await getOrCreateSession(userId);
+        const response = await getHoncho().apps.users.sessions.chat(
+          appId,
+          user.id,
+          session.id,
+          { queries: args.question },
+        );
 
-server.tool(
-  'honcho_context',
-  "Get Honcho context about this user.",
-  {},
-  async () => {
-    const data = {
-      type: 'honcho_context',
-      userId,
-      groupFolder,
-      chatJid,
-      timestamp: new Date().toISOString(),
-    };
-    writeIpcFile(MESSAGES_DIR, data);
-    return { content: [{ type: 'text' as const, text: 'Honcho context submitted.' }] };
-  },
-);
+        return { content: [{ type: 'text' as const, text: response.content || 'No information found.' }] };
+      } catch (err) {
+        console.error('[honcho_recall] Error:', err);
+        return { content: [{ type: 'text' as const, text: `Honcho query failed: ${err instanceof Error ? err.message : 'Unknown error'}` }], isError: true };
+      }
+    },
+  );
+} catch (e) {
+  console.error('[MCP] Error registering honcho_recall:', e);
+}
+
+try {
+  server.tool(
+    'honcho_search',
+    'Search Honcho observations about this user.',
+    { query: z.string() },
+    async (args) => {
+      if (!isHonchoEnabled()) {
+        return { content: [{ type: 'text' as const, text: 'Honcho is not enabled for this group.' }] };
+      }
+
+      try {
+        const { user, session, appId } = await getOrCreateSession(userId);
+        // Use chat with a search-framed query
+        const response = await getHoncho().apps.users.sessions.chat(
+          appId,
+          user.id,
+          session.id,
+          { queries: `Search for: ${args.query}` },
+        );
+
+        return { content: [{ type: 'text' as const, text: response.content || 'No results found.' }] };
+      } catch (err) {
+        console.error('[honcho_search] Error:', err);
+        return { content: [{ type: 'text' as const, text: `Search failed: ${err instanceof Error ? err.message : 'Unknown error'}` }], isError: true };
+      }
+    },
+  );
+} catch (e) {
+  console.error('[MCP] Error registering honcho_search:', e);
+}
+
+try {
+  server.tool(
+    'honcho_context',
+    'Get Honcho context about this user.',
+    {},
+    async () => {
+      if (!isHonchoEnabled()) {
+        return { content: [{ type: 'text' as const, text: 'Honcho is not enabled for this group.' }] };
+      }
+
+      try {
+        const { user, session, appId } = await getOrCreateSession(userId);
+        const messages = await getHoncho().apps.users.sessions.messages.list(
+          appId,
+          user.id,
+          session.id,
+          { size: 20, reverse: true },
+        );
+
+        const lines: string[] = [];
+        if (messages.items && messages.items.length > 0) {
+          lines.push('## Recent conversation context from Honcho');
+          // Reverse to get chronological order
+          for (const msg of messages.items.reverse()) {
+            const role = msg.is_user ? 'User' : 'Assistant';
+            lines.push(`${role}: ${msg.content}`);
+          }
+        }
+
+        const text = lines.length > 0 ? lines.join('\n') : 'No context available.';
+        return { content: [{ type: 'text' as const, text }] };
+      } catch (err) {
+        console.error('[honcho_context] Error:', err);
+        return { content: [{ type: 'text' as const, text: `Failed to get context: ${err instanceof Error ? err.message : 'Unknown error'}` }], isError: true };
+      }
+    },
+  );
+} catch (e) {
+  console.error('[MCP] Error registering honcho_context:', e);
+}
 
 // Start the stdio transport
 const transport = new StdioServerTransport();

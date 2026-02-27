@@ -207,7 +207,15 @@ function buildVolumeMounts(
  * Secrets are never written to disk or mounted as files.
  */
 function readSecrets(): Record<string, string> {
-  return readEnvFile(['CLAUDE_CODE_OAUTH_TOKEN', 'ANTHROPIC_API_KEY', 'SIGMAGRID_API_KEY', 'SIGMAGRID_ENDPOINT']);
+  return readEnvFile([
+    'CLAUDE_CODE_OAUTH_TOKEN',
+    'ANTHROPIC_API_KEY',
+    'SIGMAGRID_API_KEY',
+    'SIGMAGRID_ENDPOINT',
+    'HONCHO_API_KEY',
+    'HONCHO_WORKSPACE',
+    'HONCHO_GROUPS',
+  ]);
 }
 
 function buildContainerArgs(

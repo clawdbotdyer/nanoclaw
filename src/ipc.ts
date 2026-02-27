@@ -92,88 +92,23 @@ export function startIpcWatcher(deps: IpcDeps): void {
                   );
                 }
               } else if (data.type === 'honcho_query' && data.userId && data.groupFolder && data.chatJid) {
-                // Handle honcho_recall queries
-                const targetGroup = registeredGroups[data.chatJid];
-                if (
-                  isMain ||
-                  (targetGroup && targetGroup.folder === sourceGroup)
-                ) {
-                  if (isHonchoEnabled(data.groupFolder)) {
-                    try {
-                      const response = await queryHoncho(
-                        data.userId,
-                        data.groupFolder,
-                        data.question,
-                      );
-                      await deps.sendMessage(data.chatJid, response);
-                      logger.info(
-                        { userId: data.userId, groupFolder: data.groupFolder },
-                        'Honcho query processed',
-                      );
-                    } catch (err) {
-                      logger.error({ err }, 'Honcho query failed');
-                      await deps.sendMessage(data.chatJid, 'Honcho query failed.');
-                    }
-                  } else {
-                    await deps.sendMessage(data.chatJid, 'Honcho is not enabled for this group.');
-                  }
-                } else {
-                  logger.warn(
-                    { chatJid: data.chatJid, sourceGroup },
-                    'Unauthorized Honcho query attempt blocked',
-                  );
-                }
+                // Deprecated: honcho_query is now handled directly by MCP tools
+                logger.warn(
+                  { userId: data.userId, groupFolder: data.groupFolder },
+                  'Received deprecated honcho_query IPC message — honcho_recall tool now calls Honcho directly',
+                );
               } else if (data.type === 'honcho_search' && data.userId && data.groupFolder && data.chatJid) {
-                // Handle honcho_search queries (not yet implemented in honcho-memory, placeholder)
-                const targetGroup = registeredGroups[data.chatJid];
-                if (
-                  isMain ||
-                  (targetGroup && targetGroup.folder === sourceGroup)
-                ) {
-                  if (isHonchoEnabled(data.groupFolder)) {
-                    await deps.sendMessage(data.chatJid, `Searching Honcho for: "${data.query}"\n\n(Search feature coming soon)`);
-                    logger.info(
-                      { userId: data.userId, query: data.query },
-                      'Honcho search requested',
-                    );
-                  } else {
-                    await deps.sendMessage(data.chatJid, 'Honcho is not enabled for this group.');
-                  }
-                } else {
-                  logger.warn(
-                    { chatJid: data.chatJid, sourceGroup },
-                    'Unauthorized Honcho search attempt blocked',
-                  );
-                }
+                // Deprecated: honcho_search is now handled directly by MCP tools
+                logger.warn(
+                  { userId: data.userId, query: data.query },
+                  'Received deprecated honcho_search IPC message — honcho_search tool now calls Honcho directly',
+                );
               } else if (data.type === 'honcho_context' && data.userId && data.groupFolder && data.chatJid) {
-                // Handle honcho_context queries
-                const targetGroup = registeredGroups[data.chatJid];
-                if (
-                  isMain ||
-                  (targetGroup && targetGroup.folder === sourceGroup)
-                ) {
-                  if (isHonchoEnabled(data.groupFolder)) {
-                    try {
-                      const context = await getHonchoContext(data.userId, data.groupFolder);
-                      const response = context || 'No Honcho context available yet.';
-                      await deps.sendMessage(data.chatJid, response);
-                      logger.info(
-                        { userId: data.userId, groupFolder: data.groupFolder },
-                        'Honcho context retrieved',
-                      );
-                    } catch (err) {
-                      logger.error({ err }, 'Honcho context retrieval failed');
-                      await deps.sendMessage(data.chatJid, 'Could not retrieve Honcho context.');
-                    }
-                  } else {
-                    await deps.sendMessage(data.chatJid, 'Honcho is not enabled for this group.');
-                  }
-                } else {
-                  logger.warn(
-                    { chatJid: data.chatJid, sourceGroup },
-                    'Unauthorized Honcho context attempt blocked',
-                  );
-                }
+                // Deprecated: honcho_context is now handled directly by MCP tools
+                logger.warn(
+                  { userId: data.userId, groupFolder: data.groupFolder },
+                  'Received deprecated honcho_context IPC message — honcho_context tool now calls Honcho directly',
+                );
               }
               fs.unlinkSync(filePath);
             } catch (err) {

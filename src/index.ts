@@ -203,6 +203,7 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
   await channel.setTyping?.(chatJid, true);
   let hadError = false;
   let outputSentToUser = false;
+  let agentTextOutput = '';
 
   const output = await runAgent(group, augmentedPrompt, chatJid, async (result) => {
     // Streaming output callback — called for each agent result
@@ -215,6 +216,7 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
       const text = raw.replace(/<internal>[\s\S]*?<\/internal>/g, '').trim();
       logger.info({ group: group.name }, `Agent output: ${raw.slice(0, 200)}`);
       if (text) {
+        agentTextOutput += (agentTextOutput ? '\n' : '') + text;
         await channel.sendMessage(chatJid, text);
         outputSentToUser = true;
       }
@@ -237,8 +239,8 @@ async function processGroupMessages(chatJid: string): Promise<boolean> {
   // Observe exchange with Honcho (fire-and-forget)
   if (isHonchoEnabled(group.folder) && !hadError) {
     const userMessage = prompt;
-    const agentOutput = output === 'success' ? 'Completed successfully' : output;
-    observeExchange(userId, group.folder, userMessage, agentOutput).catch(() => {});
+    const storedOutput = agentTextOutput || (output === 'success' ? 'Completed successfully' : output);
+    observeExchange(userId, group.folder, userMessage, storedOutput).catch(() => {});
   }
 
   if (output === 'error' || hadError) {
