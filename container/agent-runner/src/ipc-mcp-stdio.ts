@@ -40,6 +40,7 @@ function getHoncho(): Honcho {
   if (!_honcho) {
     _honcho = new Honcho({
       apiKey: HONCHO_API_KEY,
+      environment: 'production',
     });
   }
   return _honcho;
@@ -381,8 +382,9 @@ try {
 
         return { content: [{ type: 'text' as const, text: response.content || 'No information found.' }] };
       } catch (err) {
-        console.error('[honcho_recall] Error:', err);
-        return { content: [{ type: 'text' as const, text: `Honcho query failed: ${err instanceof Error ? err.message : 'Unknown error'}` }], isError: true };
+        const errMsg = err instanceof Error ? err.message : String(err);
+        console.error('[honcho_recall] Full error:', JSON.stringify({ message: errMsg, name: err instanceof Error ? err.name : 'unknown' }, null, 2));
+        return { content: [{ type: 'text' as const, text: `Honcho query failed: ${errMsg}` }], isError: true };
       }
     },
   );
