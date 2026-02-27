@@ -19,6 +19,7 @@ const TASKS_DIR = path.join(IPC_DIR, 'tasks');
 const chatJid = process.env.NANOCLAW_CHAT_JID!;
 const groupFolder = process.env.NANOCLAW_GROUP_FOLDER!;
 const isMain = process.env.NANOCLAW_IS_MAIN === '1';
+const userId = chatJid.split('@')[0]; // Extract user ID from JID
 
 function writeIpcFile(dir: string, data: object): string {
   fs.mkdirSync(dir, { recursive: true });
@@ -277,6 +278,71 @@ Use available_groups.json to find the JID for a group. The folder name should be
     return {
       content: [{ type: 'text' as const, text: `Group "${args.name}" registered. It will start receiving messages immediately.` }],
     };
+  },
+);
+
+server.tool(
+  'honcho_recall',
+  'Ask Honcho a natural language question about this user. Uses dialectic reasoning to search across all stored observations and conversation history. Example: "What are their main interests?" or "Have they mentioned X before?"',
+  {
+    question: z.string().describe('Natural language question about the user'),
+  },
+  async (args) => {
+    const data = {
+      type: 'honcho_query',
+      question: args.question,
+      userId,
+      groupFolder,
+      chatJid,
+      timestamp: new Date().toISOString(),
+    };
+
+    writeIpcFile(MESSAGES_DIR, data);
+
+    return { content: [{ type: 'text' as const, text: 'Query sent to Honcho.' }] };
+  },
+);
+
+server.tool(
+  'honcho_search',
+  'Semantic search over stored Honcho observations about this user. Find patterns and insights across past sessions.',
+  {
+    query: z.string().describe('Search query (e.g., "preferences", "pain points", "technical skills")'),
+    top_k: z.number().optional().describe('Number of results to return (default: 5)'),
+  },
+  async (args) => {
+    const data = {
+      type: 'honcho_search',
+      query: args.query,
+      topK: args.top_k || 5,
+      userId,
+      groupFolder,
+      chatJid,
+      timestamp: new Date().toISOString(),
+    };
+
+    writeIpcFile(MESSAGES_DIR, data);
+
+    return { content: [{ type: 'text' as const, text: `Searching Honcho for "${args.query}"...` }] };
+  },
+);
+
+server.tool(
+  'honcho_context',
+  "Get this user's Honcho peer card (key conclusions) and recent session context. Shows what Honcho has learned about them.",
+  {},
+  async () => {
+    const data = {
+      type: 'honcho_context',
+      userId,
+      groupFolder,
+      chatJid,
+      timestamp: new Date().toISOString(),
+    };
+
+    writeIpcFile(MESSAGES_DIR, data);
+
+    return { content: [{ type: 'text' as const, text: 'Fetching Honcho context...' }] };
   },
 );
 

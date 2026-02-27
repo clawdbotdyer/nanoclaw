@@ -14,6 +14,7 @@ import { createTask, deleteTask, getTaskById, updateTask } from './db.js';
 import { isValidGroupFolder } from './group-folder.js';
 import { logger } from './logger.js';
 import { RegisteredGroup } from './types.js';
+import { getHonchoContext, queryHoncho, isHonchoEnabled } from './honcho-memory.js';
 
 export interface IpcDeps {
   sendMessage: (jid: string, text: string) => Promise<void>;
@@ -88,6 +89,89 @@ export function startIpcWatcher(deps: IpcDeps): void {
                   logger.warn(
                     { chatJid: data.chatJid, sourceGroup },
                     'Unauthorized IPC message attempt blocked',
+                  );
+                }
+              } else if (data.type === 'honcho_query' && data.userId && data.groupFolder && data.chatJid) {
+                // Handle honcho_recall queries
+                const targetGroup = registeredGroups[data.chatJid];
+                if (
+                  isMain ||
+                  (targetGroup && targetGroup.folder === sourceGroup)
+                ) {
+                  if (isHonchoEnabled(data.groupFolder)) {
+                    try {
+                      const response = await queryHoncho(
+                        data.userId,
+                        data.groupFolder,
+                        data.question,
+                      );
+                      await deps.sendMessage(data.chatJid, response);
+                      logger.info(
+                        { userId: data.userId, groupFolder: data.groupFolder },
+                        'Honcho query processed',
+                      );
+                    } catch (err) {
+                      logger.error({ err }, 'Honcho query failed');
+                      await deps.sendMessage(data.chatJid, 'Honcho query failed.');
+                    }
+                  } else {
+                    await deps.sendMessage(data.chatJid, 'Honcho is not enabled for this group.');
+                  }
+                } else {
+                  logger.warn(
+                    { chatJid: data.chatJid, sourceGroup },
+                    'Unauthorized Honcho query attempt blocked',
+                  );
+                }
+              } else if (data.type === 'honcho_search' && data.userId && data.groupFolder && data.chatJid) {
+                // Handle honcho_search queries (not yet implemented in honcho-memory, placeholder)
+                const targetGroup = registeredGroups[data.chatJid];
+                if (
+                  isMain ||
+                  (targetGroup && targetGroup.folder === sourceGroup)
+                ) {
+                  if (isHonchoEnabled(data.groupFolder)) {
+                    await deps.sendMessage(data.chatJid, `Searching Honcho for: "${data.query}"\n\n(Search feature coming soon)`);
+                    logger.info(
+                      { userId: data.userId, query: data.query },
+                      'Honcho search requested',
+                    );
+                  } else {
+                    await deps.sendMessage(data.chatJid, 'Honcho is not enabled for this group.');
+                  }
+                } else {
+                  logger.warn(
+                    { chatJid: data.chatJid, sourceGroup },
+                    'Unauthorized Honcho search attempt blocked',
+                  );
+                }
+              } else if (data.type === 'honcho_context' && data.userId && data.groupFolder && data.chatJid) {
+                // Handle honcho_context queries
+                const targetGroup = registeredGroups[data.chatJid];
+                if (
+                  isMain ||
+                  (targetGroup && targetGroup.folder === sourceGroup)
+                ) {
+                  if (isHonchoEnabled(data.groupFolder)) {
+                    try {
+                      const context = await getHonchoContext(data.userId, data.groupFolder);
+                      const response = context || 'No Honcho context available yet.';
+                      await deps.sendMessage(data.chatJid, response);
+                      logger.info(
+                        { userId: data.userId, groupFolder: data.groupFolder },
+                        'Honcho context retrieved',
+                      );
+                    } catch (err) {
+                      logger.error({ err }, 'Honcho context retrieval failed');
+                      await deps.sendMessage(data.chatJid, 'Could not retrieve Honcho context.');
+                    }
+                  } else {
+                    await deps.sendMessage(data.chatJid, 'Honcho is not enabled for this group.');
+                  }
+                } else {
+                  logger.warn(
+                    { chatJid: data.chatJid, sourceGroup },
+                    'Unauthorized Honcho context attempt blocked',
                   );
                 }
               }
