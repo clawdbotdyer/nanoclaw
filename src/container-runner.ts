@@ -182,6 +182,18 @@ function buildVolumeMounts(
   );
   if (!fs.existsSync(groupAgentRunnerDir) && fs.existsSync(agentRunnerSrc)) {
     fs.cpSync(agentRunnerSrc, groupAgentRunnerDir, { recursive: true });
+  } else if (fs.existsSync(agentRunnerSrc)) {
+    // Sync any canonical source files that are newer than the per-group copy.
+    // This ensures NanoClaw updates flow through without wiping per-group customizations.
+    for (const file of fs.readdirSync(agentRunnerSrc)) {
+      const srcFile = path.join(agentRunnerSrc, file);
+      const dstFile = path.join(groupAgentRunnerDir, file);
+      const srcMtime = fs.statSync(srcFile).mtimeMs;
+      const dstMtime = fs.existsSync(dstFile) ? fs.statSync(dstFile).mtimeMs : 0;
+      if (srcMtime > dstMtime) {
+        fs.copyFileSync(srcFile, dstFile);
+      }
+    }
   }
   mounts.push({
     hostPath: groupAgentRunnerDir,
