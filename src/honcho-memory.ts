@@ -16,10 +16,11 @@ const ALLOWED_GROUPS = new Set(
 );
 
 // ---------------------------------------------------------------------------
-// Client (lazy singleton)
+// Client (lazy singleton) + App cache
 // ---------------------------------------------------------------------------
 
 let _honcho: Honcho | null = null;
+let _appId: string | null = null;
 
 function getHoncho(): Honcho {
   if (!_honcho) {
@@ -29,6 +30,33 @@ function getHoncho(): Honcho {
     });
   }
   return _honcho;
+}
+
+/**
+ * Get or create the app for this workspace.
+ * Apps are cached per workspace — this ensures all users/sessions
+ * within a workspace share the same app context.
+ */
+async function getAppId(): Promise<string> {
+  if (_appId) return _appId;
+
+  try {
+    const honcho = getHoncho();
+    const app = await honcho.apps.getByName(WORKSPACE);
+    _appId = app.id;
+    return _appId;
+  } catch (err) {
+    // App doesn't exist, create it
+    try {
+      const honcho = getHoncho();
+      const app = await honcho.apps.create({ name: WORKSPACE });
+      _appId = app.id;
+      return _appId;
+    } catch (createErr) {
+      console.error('[honcho] Failed to get or create app:', createErr);
+      throw createErr;
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -51,9 +79,7 @@ export function isHonchoEnabled(groupFolder: string): boolean {
  * Fetch context for a user in a given group, to be injected into the agent's
  * prompt before the Claude session starts.
  *
- * Uses two Honcho endpoints:
- *   peer.get_context()  → peer card: key conclusions about the user
- *   session.context()   → recent history + summaries within token budget
+ * Retrieves recent messages from the user's session within the group.
  *
  * Returns a formatted string or '' on any failure.
  * Honcho is enhancement-only — it never blocks the agent.
@@ -61,31 +87,46 @@ export function isHonchoEnabled(groupFolder: string): boolean {
 export async function getHonchoContext(
   userId: string,
   groupFolder: string,
-  tokenBudget = 2000,
+  messageLimit = 20,
 ): Promise<string> {
   if (!isHonchoEnabled(groupFolder)) return '';
 
   try {
     const honcho = getHoncho();
-    const sessionId = `nanoclaw-${groupFolder}`;
+    const appId = await getAppId();
+    const sessionId = `${groupFolder}`;
 
-    const user = (honcho as any).peer(userId, { workspaceId: WORKSPACE });
-    const session = (honcho as any).session(sessionId, { workspaceId: WORKSPACE });
+    // Get or create the user
+    const user = await honcho.apps.users.getOrCreate(appId, userId);
 
-    const userCtx = await user.get_context();
-    const sessionCtx = await session.context({ maxTokens: tokenBudget });
+    // Try to get or create a session for this group
+    let session;
+    try {
+      session = await honcho.apps.users.sessions.get(appId, user.id, {
+        session_id: sessionId,
+      });
+    } catch (err) {
+      // Session doesn't exist, create it
+      session = await honcho.apps.users.sessions.create(appId, user.id, {
+        metadata: { group: groupFolder },
+      });
+    }
+
+    // Fetch recent messages
+    const messages = await honcho.apps.users.sessions.messages.list(
+      appId,
+      user.id,
+      session.id,
+      { size: messageLimit, reverse: true },
+    );
 
     const lines: string[] = [];
 
-    if (userCtx.peer_card?.length > 0) {
-      lines.push('## Honcho: Who this user is');
-      lines.push(userCtx.peer_card.join('\n'));
-    }
-
-    if (sessionCtx?.messages?.length > 0) {
-      lines.push('\n## Honcho: Recent conversation context');
-      for (const msg of sessionCtx.messages) {
-        const role = msg.is_human ? 'User' : 'Assistant';
+    if (messages.items && messages.items.length > 0) {
+      lines.push('## Recent conversation history (Honcho)');
+      // Reverse to get chronological order
+      for (const msg of messages.items.reverse()) {
+        const role = msg.is_user ? 'User' : 'Assistant';
         lines.push(`${role}: ${msg.content}`);
       }
     }
@@ -105,9 +146,8 @@ export async function getHonchoContext(
  * Persist a user message and agent response to Honcho after the Claude
  * session completes. Fire-and-forget — never await in the hot path.
  *
- * Honcho's Neuromancer model processes these asynchronously and updates
- * its representation of each peer in the background. Dreaming then runs
- * between sessions to fill gaps and refine conclusions.
+ * Messages are stored in the session for this group, allowing future
+ * context injection to include conversation history.
  */
 export async function observeExchange(
   userId: string,
@@ -119,16 +159,38 @@ export async function observeExchange(
 
   try {
     const honcho = getHoncho();
-    const sessionId = `nanoclaw-${groupFolder}`;
+    const appId = await getAppId();
+    const sessionId = `${groupFolder}`;
 
-    const user = (honcho as any).peer(userId, { workspaceId: WORKSPACE });
-    const agent = (honcho as any).peer(AGENT_PEER, { workspaceId: WORKSPACE });
-    const session = (honcho as any).session(sessionId, { workspaceId: WORKSPACE });
+    // Get or create the user
+    const user = await honcho.apps.users.getOrCreate(appId, userId);
 
-    await session.add_messages([
-      user.message(userMessage),
-      agent.message(agentResponse),
-    ]);
+    // Try to get or create a session for this group
+    let session;
+    try {
+      session = await honcho.apps.users.sessions.get(appId, user.id, {
+        session_id: sessionId,
+      });
+    } catch (err) {
+      // Session doesn't exist, create it
+      session = await honcho.apps.users.sessions.create(appId, user.id, {
+        metadata: { group: groupFolder },
+      });
+    }
+
+    // Add both messages to the session in order
+    await honcho.apps.users.sessions.messages.batch(appId, user.id, session.id, {
+      messages: [
+        {
+          content: userMessage,
+          is_user: true,
+        },
+        {
+          content: agentResponse,
+          is_user: false,
+        },
+      ],
+    });
   } catch (err) {
     console.warn('[honcho] observeExchange failed (non-fatal):', err);
   }
@@ -141,9 +203,8 @@ export async function observeExchange(
 /**
  * Ask Honcho a natural-language question about a user.
  *
- * Uses peer.chat() which triggers Honcho's dialectic reasoning — it searches
- * across all stored conclusions, message history, and derived representations.
- * More powerful than a simple RAG lookup.
+ * Uses session.chat() which triggers Honcho's dialectic reasoning — it searches
+ * across session message history and derives context.
  */
 export async function queryHoncho(
   userId: string,
@@ -156,9 +217,34 @@ export async function queryHoncho(
 
   try {
     const honcho = getHoncho();
-    const user = (honcho as any).peer(userId, { workspaceId: WORKSPACE });
-    const response = await user.chat(question);
-    return typeof response === 'string' ? response : JSON.stringify(response);
+    const appId = await getAppId();
+    const sessionId = `${groupFolder}`;
+
+    // Get or create the user
+    const user = await honcho.apps.users.getOrCreate(appId, userId);
+
+    // Try to get or create a session for this group
+    let session;
+    try {
+      session = await honcho.apps.users.sessions.get(appId, user.id, {
+        session_id: sessionId,
+      });
+    } catch (err) {
+      // Session doesn't exist, create it
+      session = await honcho.apps.users.sessions.create(appId, user.id, {
+        metadata: { group: groupFolder },
+      });
+    }
+
+    // Use dialectic reasoning to answer the question
+    const response = await honcho.apps.users.sessions.chat(
+      appId,
+      user.id,
+      session.id,
+      { queries: question },
+    );
+
+    return response.content || 'No response from Honcho.';
   } catch (err) {
     console.warn('[honcho] queryHoncho failed:', err);
     return 'Honcho query failed.';
@@ -170,19 +256,20 @@ export async function queryHoncho(
 // ---------------------------------------------------------------------------
 
 /**
- * Register a swarm agent as a named peer in Honcho.
+ * Register a swarm agent as a named user in Honcho.
  *
- * Call at startup for each agent in HONCHO_SWARM_PEERS. Each swarm agent
- * builds its own model in Honcho — separate from the main assistant peer —
- * and peer-peer observation can be configured via the Honcho dashboard.
+ * Call at startup for each agent in HONCHO_SWARM_PEERS. Creates a dedicated
+ * user record for the agent so its activity can be tracked separately.
  */
 export async function registerAgentPeer(peerId: string): Promise<void> {
   try {
     const honcho = getHoncho();
-    (honcho as any).peer(peerId, {
-      workspaceId: WORKSPACE,
-      config: { role: 'agent', registeredBy: AGENT_PEER },
-    });
+    const appId = await getAppId();
+
+    // Create or get the swarm agent user
+    await honcho.apps.users.getOrCreate(appId, peerId);
+
+    console.log(`[honcho] Registered swarm agent: ${peerId}`);
   } catch (err) {
     console.warn(`[honcho] registerAgentPeer(${peerId}) failed (non-fatal):`, err);
   }
