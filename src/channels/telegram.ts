@@ -62,7 +62,7 @@ export class TelegramChannel implements Channel {
       const jid = `tg:${chatId}`;
       const name = (ctx.chat as any).title || `Group ${chatId}`;
       const folder = sanitizeFolderName(name);
-      const trigger = '@SigmaBoy';
+      const trigger = `@${ASSISTANT_NAME}`;
 
       this.opts.registerGroup(jid, {
         name,
@@ -72,7 +72,7 @@ export class TelegramChannel implements Channel {
         requiresTrigger: true,
       });
 
-      ctx.reply('Group registered! Send @SigmaBoy hello to test.');
+      ctx.reply(`Group registered! Send @${ASSISTANT_NAME} hello to test.`);
     });
 
     this.bot.on('message:text', async (ctx) => {
