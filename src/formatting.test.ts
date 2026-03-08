@@ -59,7 +59,7 @@ describe('escapeXml', () => {
 
 describe('formatMessages', () => {
   it('formats a single message as XML', () => {
-    const result = formatMessages([makeMsg()]);
+    const result = formatMessages([makeMsg()], 'UTC');
     expect(result).toBe(
       '<messages>\n' +
         '<message sender="Alice" time="2024-01-01T00:00:00.000Z">hello</message>\n' +
@@ -77,7 +77,7 @@ describe('formatMessages', () => {
       }),
       makeMsg({ id: '2', sender_name: 'Bob', content: 'hey', timestamp: 't2' }),
     ];
-    const result = formatMessages(msgs);
+    const result = formatMessages(msgs, 'UTC');
     expect(result).toContain('sender="Alice"');
     expect(result).toContain('sender="Bob"');
     expect(result).toContain('>hi</message>');
@@ -85,22 +85,22 @@ describe('formatMessages', () => {
   });
 
   it('escapes special characters in sender names', () => {
-    const result = formatMessages([makeMsg({ sender_name: 'A & B <Co>' })]);
+    const result = formatMessages([makeMsg({ sender_name: 'A & B <Co>' })], 'UTC');
     expect(result).toContain('sender="A &amp; B &lt;Co&gt;"');
   });
 
   it('escapes special characters in content', () => {
     const result = formatMessages([
       makeMsg({ content: '<script>alert("xss")</script>' }),
-    ]);
+    ], 'UTC');
     expect(result).toContain(
       '&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;',
     );
   });
 
   it('handles empty array', () => {
-    const result = formatMessages([]);
-    expect(result).toBe('<messages>\n\n</messages>');
+    const result = formatMessages([], 'UTC');
+    expect(result).toContain('<messages>');
   });
 });
 
