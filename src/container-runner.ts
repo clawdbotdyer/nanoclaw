@@ -227,6 +227,7 @@ function readSecrets(): Record<string, string> {
     'HONCHO_API_KEY',
     'HONCHO_WORKSPACE',
     'HONCHO_GROUPS',
+    'GITHUB_TOKEN',
   ]);
 }
 

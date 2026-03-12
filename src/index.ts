@@ -516,10 +516,14 @@ function ensureContainerSystemRunning(): void {
       stdio: ['pipe', 'pipe', 'pipe'],
       encoding: 'utf-8',
     });
-    const containers: { status: string; configuration: { id: string } }[] = JSON.parse(output || '[]');
+    // Docker Engine outputs NDJSON (one JSON object per line), not a JSON array
+    const containers = (output || '').split('\n')
+      .filter((line) => line.trim())
+      .map((line) => { try { return JSON.parse(line); } catch { return null; } })
+      .filter(Boolean) as { Names: string; State: string }[];
     const orphans = containers
-      .filter((c) => c.status === 'running' && c.configuration.id.startsWith('nanoclaw-'))
-      .map((c) => c.configuration.id);
+      .filter((c) => c.State === 'running' && c.Names.startsWith('nanoclaw-'))
+      .map((c) => c.Names);
     for (const name of orphans) {
       try {
         execSync(`docker stop ${name}`, { stdio: 'pipe' });

@@ -34,6 +34,23 @@ Text inside `<internal>` tags is logged but not sent to the user. If you've alre
 
 When working as a sub-agent or teammate, only use `send_message` if instructed to by the main agent.
 
+## GitHub / Git Push
+
+A `GITHUB_TOKEN` env var is available in your environment. Use it for HTTPS git pushes:
+
+```bash
+# Set up HTTPS remote with token (replace owner/repo):
+git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/owner/repo.git
+git push
+```
+
+Or inline:
+```bash
+git -c "url.https://x-access-token:${GITHUB_TOKEN}@github.com/.insteadOf=git@github.com:" push
+```
+
+SSH remotes won't work from inside the container — always use HTTPS with the token.
+
 ## Your Workspace
 
 Files you create are saved in `/workspace/group/`. Use this for notes, research, or anything that should persist.
