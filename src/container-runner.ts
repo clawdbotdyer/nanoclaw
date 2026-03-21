@@ -214,21 +214,54 @@ function buildVolumeMounts(
   return mounts;
 }
 
+// Secrets available to every group (SDK auth tokens are also stripped from
+// Bash subprocesses by createSanitizeBashHook in the agent-runner).
+const UNIVERSAL_SECRETS = [
+  'CLAUDE_CODE_OAUTH_TOKEN',
+  'ANTHROPIC_API_KEY',
+  'HONCHO_API_KEY',
+  'HONCHO_WORKSPACE',
+  'HONCHO_GROUPS',
+];
+
+// Additional secrets scoped to specific groups.
+// Only the named group receives these — minimises blast radius from prompt
+// injection in groups that scrape external content (e.g. essex-scoop).
+const GROUP_SECRETS: Record<string, string[]> = {
+  'main': [
+    'GITHUB_TOKEN',
+    'SIGMAGRID_API_KEY',
+    'SIGMAGRID_ENDPOINT',
+  ],
+  'sigmaboy': [
+    'SIGMAGRID_API_KEY',
+    'SIGMAGRID_ENDPOINT',
+  ],
+  'sigmaboy-orchestrator': [
+    'SIGMAGRID_API_KEY',
+    'SIGMAGRID_ENDPOINT',
+  ],
+  'essex-scoop': [
+    'CF_ACCOUNT_ID',
+    'R2_ACCESS_KEY_ID',
+    'R2_SECRET_ACCESS_KEY',
+    'R2_PUBLIC_URL',
+    'INSTAGRAM_ACCESS_TOKEN',
+    'INSTAGRAM_ACCOUNT_ID',
+    'RESEND_API_KEY',
+    'OPENWEATHER_API_KEY',
+    'NEXT_PUBLIC_CONVEX_URL',
+  ],
+};
+
 /**
  * Read allowed secrets from .env for passing to the container via stdin.
  * Secrets are never written to disk or mounted as files.
+ * Only secrets relevant to the given group are included.
  */
-function readSecrets(): Record<string, string> {
-  return readEnvFile([
-    'CLAUDE_CODE_OAUTH_TOKEN',
-    'ANTHROPIC_API_KEY',
-    'SIGMAGRID_API_KEY',
-    'SIGMAGRID_ENDPOINT',
-    'HONCHO_API_KEY',
-    'HONCHO_WORKSPACE',
-    'HONCHO_GROUPS',
-    'GITHUB_TOKEN',
-  ]);
+function readSecrets(groupFolder: string): Record<string, string> {
+  const keys = [...UNIVERSAL_SECRETS, ...(GROUP_SECRETS[groupFolder] ?? [])];
+  return readEnvFile(keys);
 }
 
 function buildContainerArgs(
@@ -236,6 +269,12 @@ function buildContainerArgs(
   containerName: string,
 ): string[] {
   const args: string[] = ['run', '-i', '--rm', '--name', containerName];
+
+  // Increase shared memory for Chromium/Playwright — Docker's default 64MB causes crashes
+  args.push('--shm-size=256m');
+
+  // Disable core dumps inside containers — crashes write huge files into mounted volumes
+  args.push('--ulimit', 'core=0');
 
   // Pass host timezone so container's local time matches the user's
   args.push('-e', `TZ=${TIMEZONE}`);
@@ -318,7 +357,7 @@ export async function runContainerAgent(
     let stderrTruncated = false;
 
     // Pass secrets via stdin (never written to disk or mounted as files)
-    input.secrets = readSecrets();
+    input.secrets = readSecrets(group.folder);
     container.stdin.write(JSON.stringify(input));
     container.stdin.end();
     // Remove secrets from input so they don't appear in logs
