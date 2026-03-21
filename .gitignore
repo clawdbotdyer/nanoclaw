@@ -57,3 +57,6 @@ groups/global/*
 agents-sdk-docs
 workspace/swarm-state/
 .env
+groups/*/node_modules
+groups/*/remotion/node_modules
+groups/**/node_modules
